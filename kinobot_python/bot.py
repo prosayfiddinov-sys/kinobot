@@ -1,4 +1,4 @@
-import os, random, logging, html
+import os, random, logging, html, asyncio
 from pathlib import Path
 from datetime import datetime, date, timedelta
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
@@ -323,7 +323,14 @@ def main():
     app.add_handler(MessageHandler(filters.ALL & ~filters.COMMAND, handle_text))
     app.add_error_handler(error_handler)
     log.info("Kino bot ishga tushdi")
-    app.run_polling(allowed_updates=Update.ALL_TYPES)
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    try:
+        app.run_polling(allowed_updates=Update.ALL_TYPES)
+    finally:
+        if not loop.is_closed():
+            loop.close()
+        asyncio.set_event_loop(None)
 
 if __name__ == "__main__":
     main()
